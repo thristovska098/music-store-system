@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+
+    <xsd:simpleType name="EMAILTYPE">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="[_\-a-zA-Z0-9\.\+]+@[a-zA-Z0-9](\.?[\-a-zA-Z0-9]*[a-zA-Z0-9])*"></xsd:pattern>
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+    <xsd:simpleType name="PHONETYPE">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="|(75\d{1}\-\d{4})"></xsd:pattern>
+            <xsd:maxLength value="8"></xsd:maxLength>
+            <xsd:minLength value="0"></xsd:minLength>
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+
+    
+    <xsd:simpleType name="ADDRESTYPE1">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="(|\D{1,}St\.\s{0,1}\d{1,2})"></xsd:pattern>
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+    <xsd:complexType name="ADDRESSTYPE2">
+        <xsd:sequence>
+            <xsd:element name="STREET" type="xsd:string"/>
+            <xsd:element name="NUMBER" type="xsd:integer"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    
+
+    
+    <xsd:group name="PODATOCI">
+        <xsd:sequence>
+            <xsd:element name="NAME" type="xsd:string"/>
+            <xsd:element name="MIDDLE_NAME" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="SURNAME" type="xsd:string"/>
+            <xsd:choice>
+                <xsd:element name="ADDRESS" type="ADDRESTYPE1"  minOccurs="0" maxOccurs="1"/>
+                <xsd:element name="ADDRESS1" type="ADDRESSTYPE2" minOccurs="0" maxOccurs="1"/>
+            </xsd:choice>
+        </xsd:sequence>
+    </xsd:group>
+    
+    <xsd:complexType name="BASIC_INFOTYPE">
+        <xsd:group ref="PODATOCI"/>
+    </xsd:complexType>
+    
+
+    
+    
+    <xsd:complexType name="CLIENTTYPE">
+        <xsd:sequence>
+            <xsd:choice>
+                <xsd:element name="BASIC_INFO" type="BASIC_INFOTYPE"/>
+                <xsd:group ref="PODATOCI"/>
+            </xsd:choice>
+            <xsd:element name="EMAIL" type="EMAILTYPE"/>
+            <xsd:element name="PHONE_NUMBER" type="PHONETYPE" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="ID" type="xsd:integer"/>
+    </xsd:complexType>
+    
+    <xsd:element name="CLIENTS">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="CLIENT" type="CLIENTTYPE" minOccurs="1" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    
+</xsd:schema>

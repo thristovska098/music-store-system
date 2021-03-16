@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+    
+    <xsd:simpleType name="DATETYPE">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="(0[1-9]|1[0-2])/(0[1-9]|[1-2][0-9]|3[0-1])/(19|20)\d\d"></xsd:pattern>
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+    <xsd:simpleType name="STATESTRINGTYPE">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="functional"></xsd:enumeration>
+            <xsd:enumeration value="slightly damaged"></xsd:enumeration>
+            <xsd:enumeration value="damaged"></xsd:enumeration>
+            <xsd:enumeration value="0"></xsd:enumeration>
+            <xsd:enumeration value="1"></xsd:enumeration>
+            <xsd:enumeration value="2"></xsd:enumeration>
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+
+    
+    <xsd:complexType name="RENTTYPE">
+        <xsd:sequence>
+            <xsd:element name="FROM_DATE" type="DATETYPE" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="RETURN_STATE" type="STATESTRINGTYPE" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="RETURN_DATE" type="DATETYPE" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+        <xsd:attribute name="ID" type="xsd:integer"/>
+        <xsd:attribute name="CLIENT_ID" type="xsd:integer"/>
+        <xsd:attribute name="CD_ID" type="xsd:integer"/>
+    </xsd:complexType>
+    
+    <xsd:element name="RENTS">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="RENT" type="RENTTYPE" minOccurs="1" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    
+</xsd:schema>

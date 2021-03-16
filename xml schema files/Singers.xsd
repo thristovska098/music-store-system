@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <xsd:simpleType name="YEARTYPE">
+        <xsd:restriction base="xsd:string">
+            <xsd:length value="4"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:complexType name="SINGERTYPE">
+        <xsd:sequence>
+            <xsd:element name="YEAR_STARTED_PERFORMING" type="YEARTYPE"/>
+            <xsd:choice minOccurs="0" maxOccurs="1">
+                <xsd:element name="AGE" type="xsd:integer"/>
+                <xsd:element name="YEAR_OF_BIRTH" type="xsd:int"/>
+            </xsd:choice>
+        </xsd:sequence>
+        <xsd:attribute name="ID" type="xsd:integer"/>
+    </xsd:complexType>
+    
+    <xsd:element name="SINGERS">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="SINGER" type="SINGERTYPE" minOccurs="1" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+</xsd:schema>

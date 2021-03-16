@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <xsd:simpleType name="YEARTYPE">
+        <xsd:restriction base="xsd:string">
+            <xsd:length value="4"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:complexType name="ALBUMTYPE">
+        <xsd:sequence>
+            <xsd:element name="NAME" type="xsd:string" />
+            <xsd:element name="RELEASE_YEAR" type="YEARTYPE" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="PRICE" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="ID" type="xsd:integer"/>
+        <xsd:attribute name="ARTIST_ID" type="xsd:integer"/>
+    </xsd:complexType>
+  
+    <xsd:element name="ALBUMS" >
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="ALBUM" type="ALBUMTYPE" minOccurs="1" maxOccurs="unbounded"></xsd:element>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+</xsd:schema>

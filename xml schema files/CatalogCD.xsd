@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+
+    <xsd:simpleType name="OCCUPIEDSTRINGTYPE">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="free"></xsd:enumeration>
+            <xsd:enumeration value="occupied"></xsd:enumeration>
+            <xsd:enumeration value="0"></xsd:enumeration>
+            <xsd:enumeration value="1"></xsd:enumeration>
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+    <xsd:simpleType name="STATESTRINGTYPE">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="functional"></xsd:enumeration>
+            <xsd:enumeration value="slightly damaged"></xsd:enumeration>
+            <xsd:enumeration value="damaged"></xsd:enumeration>
+            <xsd:enumeration value="0"></xsd:enumeration>
+            <xsd:enumeration value="1"></xsd:enumeration>
+            <xsd:enumeration value="2"></xsd:enumeration>
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+
+    
+    <xsd:complexType name="CDTYPE">
+        <xsd:sequence>
+            <xsd:element name="STATE" type="STATESTRINGTYPE"/>
+            <xsd:element name="OCCUPIED" type="OCCUPIEDSTRINGTYPE"/>
+        </xsd:sequence>
+        <xsd:attribute name="ID" type="xsd:integer"/>
+        <xsd:attribute name="ALBUM_ID" type="xsd:integer"/>
+    </xsd:complexType>
+    
+    <xsd:element name="CATALOG">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="CD" type="CDTYPE" minOccurs="1" maxOccurs="unbounded"/>
+            </xsd:sequence>
+
+        </xsd:complexType>
+    </xsd:element>
+</xsd:schema>

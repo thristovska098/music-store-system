@@ -1,0 +1,100 @@
+document{
+<SYSTEM xsi:noNamespaceSchemaLocation="System.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">	
+<CLIENTS>
+{
+    for $cl in doc("Clients.xml")//CLIENT
+    return <CLIENT ID="{$cl/@ID}">
+                   {
+                  
+                    $cl/*
+                  
+                   }
+                   <RENTS>
+                   {for $r in doc("Rent.xml")//RENT[@CLIENT_ID=$cl/@ID]
+                    return <RENT ID="{$r/@ID}">
+                                  {$r/*}
+                                  {for $cd in doc("CatalogCD.xml")//CD[@ID=$r/@CD_ID]
+                                   return $cd/*}
+                                  {let $cd:=doc("CatalogCD.xml")//CD[@ID=$r/@CD_ID]
+                                    for $al in doc("Albums.xml")//ALBUM[@ID=$cd/@ALBUM_ID]
+                                    return $al/*
+                                    }
+                                    {let $cd:=doc("CatalogCD.xml")//CD[@ID=$r/@CD_ID]
+                                     let $al :=doc("Albums.xml")//ALBUM[@ID=$cd/@ALBUM_ID]
+                                    for $ar in doc("Artists.xml")//ARTIST[@ID=$al/@ARTIST_ID]
+                                    return $ar/*
+                                    }
+                                    {let $cd:=doc("CatalogCD.xml")//CD[@ID=$r/@CD_ID]
+                                    let $al :=doc("Albums.xml")//ALBUM[@ID=$cd/@ALBUM_ID]
+                                    let $ar:=doc("Artists.xml")//ARTIST[@ID=$al/@ARTIST_ID]
+                                    for $dj in doc("DJ.xml")//DJ[@ID=$ar/@ID]
+                                    return $dj/*
+                                    
+                                    }
+                                    {let $cd:=doc("CatalogCD.xml")//CD[@ID=$r/@CD_ID]
+                                    let $al :=doc("Albums.xml")//ALBUM[@ID=$cd/@ALBUM_ID]
+                                    let $ar:=doc("Artists.xml")//ARTIST[@ID=$al/@ARTIST_ID]
+                                    for $g in doc("Groups.xml")//GROUP[@ID=$ar/@ID]
+                                    return $g/*
+                                    }
+                                    {let $cd:=doc("CatalogCD.xml")//CD[@ID=$r/@CD_ID]
+                                    let $al :=doc("Albums.xml")//ALBUM[@ID=$cd/@ALBUM_ID]
+                                    let $ar:=doc("Artists.xml")//ARTIST[@ID=$al/@ARTIST_ID]
+                                    for $s in doc("Singers.xml")//SINGER[@ID=$ar/@ID]
+                                    return $s/*
+                                    }
+                                    </RENT>
+                  }</RENTS>            
+                    </CLIENT>
+}
+</CLIENTS>
+
+
+
+<ARTISTS>
+{
+ for $ar in doc("Artists.xml")//ARTIST
+ return <ARTIST ID="{$ar/@ID}">
+               {$ar/*}
+                { let $dj:=doc("DJ.xml")//DJ[@ID=$ar/@ID]
+                return $dj/*
+                }
+                { let $si:=doc("Singers.xml")//SINGER[@ID=$ar/@ID]
+                return $si/*
+                }
+                { let $g:=doc("Groups.xml")//GROUP[@ID=$ar/@ID]
+                return $g/*
+                }
+                <ALBUMS>
+                {
+                for $al in doc("Albums.xml")//ALBUM[@ARTIST_ID=$ar/@ID] 
+                return  <ALBUM ID="{$al/@ID}">
+                            {$al/*}
+                            <CDS>
+                            {
+                            for $cd in   doc("CatalogCD.xml")//CD[@ALBUM_ID= $al/@ID] 
+                            return <CD ID="{$cd/@ID}">
+                                            {$cd/*}
+                                            <RENTS>
+                                            {
+                                            for $r in doc("Rent.xml")//RENT[@CD_ID=$cd/@ID] 
+                                            return <RENT ID="{$r/@ID}">
+                                            { $r/* }
+                                            {
+                                            for $cl in doc("Clients.xml")//CLIENT[@ID=$r/@CLIENT_ID]
+                                            return  $cl/*
+                                            }
+                                            </RENT>
+                                            }
+                                            </RENTS>
+                                             </CD>
+                            }
+                            </CDS>
+                </ALBUM>
+                }
+                </ALBUMS>
+                </ARTIST>
+}
+</ARTISTS>
+</SYSTEM>
+}

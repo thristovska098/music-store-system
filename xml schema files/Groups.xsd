@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <xsd:simpleType name="YEARTYPE">
+        <xsd:restriction base="xsd:string">
+            <xsd:length value="4"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:complexType name="GROUPTYPE">
+        <xsd:sequence>
+            <xsd:element name="YEAR_FORMED" type="YEARTYPE"/> 
+            <xsd:element name="NUMBER_OF_MEMBERS" type="xsd:int"/>
+        </xsd:sequence>
+        <xsd:attribute name="ID" type="xsd:integer"/>
+    </xsd:complexType>
+    
+    <xsd:element name="GROUPS">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="GROUP" type="GROUPTYPE" minOccurs="1" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    
+</xsd:schema>

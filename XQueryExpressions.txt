@@ -1,0 +1,211 @@
+a.	List all the artists (all informations) together with the titles and dates of releasing of their albums.
+
+<ARTISTS>{
+for  $ar in doc("Artists.xml")/ARTISTS/ARTIST
+return  <ARTIST ID="{$ar/@ID}">
+                {$ar/*}
+                { let $dj:=doc("DJ.xml")/DJS/DJ[@ID=$ar/@ID]
+                return $dj/*
+                }
+                { let $g:=doc("Groups.xml")/GROUPS/GROUP[@ID=$ar/@ID]
+                return $g/*
+                }
+                { let $s:=doc("Singers.xml")/SINGERS/SINGER[@ID=$ar/@ID]
+                return $s/*
+                }
+                <ALBUMS>
+                {
+                for $al in doc("Albums.xml")/ALBUMS/ALBUM[@ARTIST_ID=$ar/@ID]
+                return <ALBUM ID="{$al/@ID}">
+                                {$al/NAME}
+                                {$al/RELEASE_YEAR}
+                               </ALBUM>
+                }
+                </ALBUMS>
+                </ARTIST>
+}
+</ARTISTS>
+
+b.Find the three clients with biggest number of rents.
+
+<CLIENTS>
+{
+(
+for $cl in doc("Clients.xml")/CLIENTS/CLIENT
+let $r:=count(doc("Rent.xml")/RENTS/RENT[@CLIENT_ID=$cl/@ID])
+order by $r descending
+return  <CLIENT ID="{$cl/@ID}">
+            {$cl/*}
+            <NUMBER_OF_RENTS>
+            {
+            let $r:=count(doc("Rent.xml")/RENTS/RENT[@CLIENT_ID=$cl/@ID])
+            return $r
+            }
+            </NUMBER_OF_RENTS>
+            </CLIENT>
+            )[position() <=3]}
+</CLIENTS>
+c.Show all the albums that were rented three or more times in the period from January to March 2020.
+
+for $al in doc("Albums.xml")/ALBUMS/ALBUM
+let $cd:=doc("CatalogCD.xml")/CATALOG/CD[$al/@ID=@ALBUM_ID]
+let $r:=count(doc("Rent.xml")/RENTS/RENT[@CD_ID=$cd/@ID][fn:ends-with(FROM_DATE,"2020")][fn:starts-with(FROM_DATE,"01/") or fn:starts-with(FROM_DATE,"02/") or fn:starts-with(FROM_DATE,"03/")])
+where $r>=3
+return <ALBUM ID="{$al/@ID}">
+{$al/*}
+{
+<BR_IZNAJMUVANJA>{$r}</BR_IZNAJMUVANJA>
+}
+</ALBUM>
+d. Show the client that rented the most from the most rented album toghether with the informations for the album.
+
+(for $cl in doc("Clients.xml")/CLIENTS/CLIENT
+let $id :=(for $al in doc("Albums.xml")/ALBUMS/ALBUM
+let $cd:=doc("CatalogCD.xml")/CATALOG/CD[$al/@ID=@ALBUM_ID]
+let $r:=count(doc("Rent.xml")/RENTS/RENT[@CD_ID=$cd/@ID])
+order by $r descending
+return <ALBUM ID="{$al/@ID}">
+{$al/*}
+{
+<BR_IZNAJMUVANJA>{$r}</BR_IZNAJMUVANJA>
+}
+</ALBUM>)[position()=1]/@ID
+let $s:=sum(
+                
+                    for $al in doc("Albums.xml")/ALBUMS/ALBUM[@ID=$id]
+                    for $cd in doc("CatalogCD.xml")/CATALOG/CD[@ALBUM_ID=$al/@ID]
+                    let $r:=count(doc("Rent.xml")/RENTS/RENT[@CD_ID=$cd/@ID  and @CLIENT_ID=$cl/@ID ])
+                    return  $r
+                 )
+ order by $s descending
+ return <CLIENT ID="{$cl/@ID}">
+                {$cl/*}
+                <ALBUM_INFO>
+                {
+                let $album:=doc("Albums.xml")/ALBUMS/ALBUM[@ID=$id]/*
+                return $album
+                }
+                </ALBUM_INFO>
+               </CLIENT>)[position()=1]
+
+e. Show the total profit made from every album (separately).
+
+for $al in doc("Albums.xml")/ALBUMS/ALBUM
+let $cd:=doc("CatalogCD.xml")/CATALOG/CD[$al/@ID=@ALBUM_ID]
+let $r:=count(doc("Rent.xml")/RENTS/RENT[@CD_ID=$cd/@ID])
+let $cena:= number(substring($al/PRICE,2))
+
+return <ALBUM ID="{$al/@ID}">
+{<KOLICINA>{$r}</KOLICINA>}
+{<CENA>{$cena}</CENA>}
+{<PROFIT>{$r * $cena}</PROFIT>}
+
+</ALBUM>
+g. Find the group which album is the most rented and has one or more CDs at the moments that are not rented.
+
+(for $g in doc("Groups.xml")/GROUPS/GROUP
+for $al in doc("Albums.xml")/ALBUMS/ALBUM[$g/@ID=@ARTIST_ID]
+                let $vk:=sum(
+                              for $cd in doc("CatalogCD.xml")/CATALOG/CD[$al/@ID=@ALBUM_ID]
+                              let $rent:=count(doc("Rent.xml")/RENTS/RENT[@CD_ID=$cd/@ID])
+                              return $rent
+                )
+                let $c1:=count(
+                doc("CatalogCD.xml")/CATALOG/CD[$al/@ID=@ALBUM_ID][OCCUPIED/text()="0" or OCCUPIED/text()="free"]) 
+                where $c1>=1
+                order by $vk descending
+                return <GROUP ID="{$g/@ID}">
+                <ALBUM ID="{$al/@ID}"/>
+                <RENTS>{$vk}</RENTS>
+                <FREE>{$c1}</FREE>
+                </GROUP>)[position()=1]
+h. Show all the clients that rented more than once CD with duration less than 10 days.
+
+for $cl in doc("Clients.xml")/CLIENTS/CLIENT
+where fn:exists(
+                            for $r in doc("Rent.xml")/RENTS/RENT[fn:exists(RETURN_DATE) and @CLIENT_ID=$cl/@ID]
+                            let $m1:=number(substring($r/FROM_DATE,1,2))
+                            let $m2:=number(substring($r/RETURN_DATE,1,2))
+                            let $d1:=number(fn:substring-before(substring($r/FROM_DATE,4,5),"/"))
+                            let $d2:=number(fn:substring-before(substring($r/RETURN_DATE,4,5),"/"))
+                            let $g1:=number(substring($r/FROM_DATE,7,10))
+                            let $g2:=number(substring($r/RETURN_DATE,7,10))
+                            where $g1=$g2 and (($m1=$m2 and ($d2 - $d1)<10 ) or ($m1+1=$m2 and (30+ $d2 - $d1)<10) )
+                            return $r)
+return <CLIENT ID="{$cl/@ID}"/>
+i.Find the favourite artist for every client( all the informations for the artist that the client has rented the biggest number of albums)
+
+for $cl in doc("Clients.xml")/CLIENTS/CLIENT
+return <CLIENT ID="{$cl/@ID}">
+{
+                (for $ar in doc("Artists.xml")/ARTISTS/ARTIST
+                let $c:=sum(
+                                                        for $al in doc("Albums.xml")/ALBUMS/ALBUM[@ARTIST_ID=$ar/@ID]
+                                                        for $cd in doc("CatalogCD.xml")/CATALOG/CD[@ALBUM_ID=$al/@ID]
+                                                        let $izn:=count(doc("Rent.xml")/RENTS/RENT[@CLIENT_ID=$cl/@ID and $cd/@ID=@CD_ID])
+                                                        return $izn
+                                
+                                )
+                   where $c>0
+                   order by $c descending
+                    return $ar)[position()=1]
+                                }
+                               
+ </CLIENT>
+j.Find the favourite artist ( the artist that is favourite to the most of the clients)
+
+(for $a in doc("Artists.xml")/ARTISTS/ARTIST
+let $om:=count(
+for $cl in doc("Clients.xml")/CLIENTS/CLIENT
+                    return  (for $ar in doc("Artists.xml")/ARTISTS/ARTIST
+                                    let $c:=sum(
+                                                                            for $al in doc("Albums.xml")/ALBUMS/ALBUM[@ARTIST_ID=$ar/@ID]
+                                                                            for $cd in doc("CatalogCD.xml")/CATALOG/CD[@ALBUM_ID=$al/@ID]
+                                                                            let $izn:=count(doc("Rent.xml")/RENTS/RENT[@CLIENT_ID=$cl/@ID and $cd/@ID=@CD_ID])
+                                                                            return $izn
+                                                    
+                                                    )
+                                       where $c>0
+                                       order by $c descending
+                                        return $ar)[position()=1][@ID=$a/@ID])
+order by $om descending
+ return <ARTIST ID="{$a/@ID}">
+                {$a/*}
+                </ARTIST>)[position()=1]
+                                       
+                                
+                               
+ 
+k.Create a function that generated monthly report. The month and the year will be passed as input parameters. The report should contain the profit for the month from all the albums and the number of rents for each album for every artist. 
+
+declare function local:Izvestaj($mesec as xs:integer, $godina as xs:integer) as element()*
+{
+let $vk_profit:=sum(
+for $al in doc("Albums.xml")/ALBUMS/ALBUM
+for $cd in doc("CatalogCD")/CATALOG/CD[$al/@ID=@ALBUM_ID]
+let $br:=sum(
+                        let $r:=count(doc("Rent.xml")/RENTS/RENT[number(substring($r/FROM_DATE,1,2))=$mesec and number(substring($r/FROM_DATE,7,10))=$godina ]
+                        [$cd/@ID=@CD_ID])
+                        return $r 
+                        )
+let $cena:= number(substring($al/PRICE,2))
+
+return $br * $cena)
+return <PROFIT>{$vk_profit}</PROFIT>
+
+
+for $ar in doc("Artists.xml")/ARTISTS/ARTIST
+return <ARTIST ID="{$ar/@ID}">
+{
+for $al in doc("Albums.xml")/ALBUMS/ALBUM[@ARTIST_ID=$ar/@ID]
+let $vk:=sum(
+                         for $cd1 in doc("CatalogCD.xml")/CATALOG/CD[$al/@ID=@ALBUM_ID]
+                         let $p:=count(doc("Rent.xml")/RENTS/RENT[$cd1/@ID=@CD_ID])
+                         return $p
+)
+return <ALBUM ID="{$al/@ID}">
+               <VK_PRODAZBI>{$vk}</VK_PRODAZBI>
+             </ALBUM>
+}
+            </ARTIST>
+};
