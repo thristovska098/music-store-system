@@ -4,13 +4,11 @@ Some of the system data is located in the following files: Albums.xml, Artists.x
 Using the previuos files generate System.xml file that will allow fast and simple access to the informations for Clients and Artists.  
 * Create XML Schema file for System.xml and create the following restrictions:  
   * the attribute occupied in the entity CD and the attribute return state in the relation Rent can have values 0,1 and 2 or functional, slightly damaged and damaged.
-		-validate the attribute email in the Client entity 
-		-the telephone numbers should be in the following format: 75x-yyyy where x is 0-9 digit and y is 1-9 digit
-		-the address may not exist, but if it exists should consists two subelemnts (street and number) 
-		or it should be in the following format "StreetName St. XX", where StreetName can be string that only contains lower and upper letters, 
-		followed by St. and XX or X (X must be digit).
-		-the other restrictions should be noticed from the XML files.
-	b.Create XQuery expression which will generate the System.xml file from the other .xml files.
+  * validate the attribute email in the Client entity 
+  * the telephone numbers should be in the following format: 75x-yyyy where x is 0-9 digit and y is 1-9 digit
+  * the address may not exist, but if it exists should consists two subelemnts (street and number) or it should be in the following format "StreetName St. XX", where StreetName can be string that only contains lower and upper letters, followed by St. and XX or X (X must be digit).
+  * the other restrictions should be noticed from the XML files.
+* Create XQuery expression which will generate the System.xml file from the other .xml files and save the expression in file named "GenerateSystem.txt".
 	
 
 #### Subject:
